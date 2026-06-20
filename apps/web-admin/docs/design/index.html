@@ -1,0 +1,3281 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Restora · Painel Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* ── DESIGN TOKENS (Notion system, DESIGN.md) ── */
+      :root {
+        --bg: #f6f5f4;
+        --surface: #ffffff;
+        --ink: #000000;
+        --ink-2: #31302e;
+        --ink-muted: #615d59;
+        --ink-faint: #a39e98;
+        --hairline: #e6e6e6;
+        --primary: #0075de;
+        --primary-press: #005bab;
+        --primary-light: #e8f2fc;
+        --secondary: #213183;
+        --success: #1aae39;
+        --success-light: #e6f7ea;
+        --warning: #dd5b00;
+        --warning-light: #fef3e8;
+        --danger: #c53030;
+        --danger-light: #fff5f5;
+        --teal: #2a9d99;
+
+        --r-xs: 4px;
+        --r-sm: 5px;
+        --r-md: 8px;
+        --r-lg: 12px;
+        --r-xl: 16px;
+        --r-full: 9999px;
+        --sidebar-w: 232px;
+        --topbar-h: 56px;
+        --shadow-sm:
+          0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 6px rgba(0, 0, 0, 0.02);
+        --shadow-md:
+          0 2px 8px rgba(0, 0, 0, 0.07), 0 1px 3px rgba(0, 0, 0, 0.04);
+        --shadow-lg:
+          0 8px 32px rgba(0, 0, 0, 0.1), 0 2px 8px rgba(0, 0, 0, 0.05);
+      }
+
+      /* ── RESET ── */
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        -webkit-font-smoothing: antialiased;
+        font-size: 16px;
+      }
+      body {
+        font-family:
+          "Inter",
+          -apple-system,
+          BlinkMacSystemFont,
+          system-ui,
+          sans-serif;
+        background: var(--bg);
+        color: var(--ink-2);
+        min-height: 100vh;
+        display: flex;
+        overflow-x: hidden;
+      }
+      button {
+        font-family: inherit;
+        cursor: pointer;
+      }
+      input,
+      select,
+      textarea {
+        font-family: inherit;
+      }
+      a {
+        text-decoration: none;
+        color: inherit;
+      }
+
+      /* ── SIDEBAR ── */
+      .sidebar {
+        width: var(--sidebar-w);
+        min-height: 100vh;
+        background: var(--surface);
+        border-right: 1px solid var(--hairline);
+        display: flex;
+        flex-direction: column;
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        z-index: 100;
+        transition: transform 0.2s ease;
+      }
+      .sb-logo {
+        height: var(--topbar-h);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 0 16px;
+        border-bottom: 1px solid var(--hairline);
+        flex-shrink: 0;
+      }
+      .sb-mark {
+        width: 28px;
+        height: 28px;
+        background: var(--secondary);
+        border-radius: var(--r-md);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+      .sb-mark svg {
+        width: 15px;
+        height: 15px;
+        fill: white;
+      }
+      .sb-name {
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--ink);
+        letter-spacing: -0.3px;
+        line-height: 1.1;
+      }
+      .sb-sub {
+        font-size: 11px;
+        font-weight: 400;
+        color: var(--ink-faint);
+      }
+      .sb-nav {
+        flex: 1;
+        padding: 8px 6px;
+        overflow-y: auto;
+      }
+      .nav-item {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        padding: 8px 10px;
+        border-radius: var(--r-md);
+        cursor: pointer;
+        font-size: 13.5px;
+        font-weight: 500;
+        color: var(--ink-muted);
+        transition:
+          background 0.1s,
+          color 0.1s;
+        user-select: none;
+        border: none;
+        background: transparent;
+        width: 100%;
+        text-align: left;
+      }
+      .nav-item:hover {
+        background: var(--bg);
+        color: var(--ink-2);
+      }
+      .nav-item.active {
+        background: var(--primary-light);
+        color: var(--primary);
+      }
+      .nav-item svg {
+        width: 17px;
+        height: 17px;
+        flex-shrink: 0;
+        opacity: 0.75;
+      }
+      .nav-item.active svg {
+        opacity: 1;
+      }
+      .nav-badge {
+        margin-left: auto;
+        background: var(--warning);
+        color: #fff;
+        font-size: 10px;
+        font-weight: 700;
+        padding: 1px 6px;
+        border-radius: var(--r-full);
+      }
+      .sb-sep {
+        height: 1px;
+        background: var(--hairline);
+        margin: 6px 6px;
+      }
+      .sb-footer {
+        padding: 8px 6px;
+        border-top: 1px solid var(--hairline);
+        flex-shrink: 0;
+      }
+      .sb-user {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        padding: 8px 10px;
+        border-radius: var(--r-md);
+        cursor: pointer;
+      }
+      .sb-user:hover {
+        background: var(--bg);
+      }
+      .avatar {
+        border-radius: var(--r-full);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        color: #fff;
+        flex-shrink: 0;
+        background: var(--secondary);
+      }
+      .sb-user-info {
+        flex: 1;
+        overflow: hidden;
+      }
+      .sb-user-name {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--ink);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .sb-user-role {
+        font-size: 11px;
+        color: var(--ink-faint);
+      }
+
+      /* ── OVERLAY (mobile) ── */
+      .overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.28);
+        z-index: 99;
+      }
+      .overlay.open {
+        display: block;
+      }
+
+      /* ── MAIN ── */
+      .main {
+        margin-left: var(--sidebar-w);
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        min-width: 0;
+      }
+
+      /* ── TOPBAR ── */
+      .topbar {
+        height: var(--topbar-h);
+        background: var(--surface);
+        border-bottom: 1px solid var(--hairline);
+        display: flex;
+        align-items: center;
+        padding: 0 20px;
+        gap: 12px;
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        flex-shrink: 0;
+      }
+      .hamburger {
+        display: none;
+        width: 34px;
+        height: 34px;
+        align-items: center;
+        justify-content: center;
+        border-radius: var(--r-md);
+        border: 1px solid var(--hairline);
+        background: transparent;
+        color: var(--ink-2);
+        flex-shrink: 0;
+      }
+      .hamburger svg {
+        width: 17px;
+        height: 17px;
+      }
+      .topbar-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--ink);
+        flex: 1;
+      }
+      .caixa-pill {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 11px;
+        border-radius: var(--r-full);
+        font-size: 12px;
+        font-weight: 600;
+        flex-shrink: 0;
+      }
+      .caixa-pill.open {
+        background: var(--success-light);
+        color: var(--success);
+      }
+      .caixa-pill.closed {
+        background: var(--warning-light);
+        color: var(--warning);
+      }
+      .caixa-pill .dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: currentColor;
+        flex-shrink: 0;
+      }
+
+      /* ── CONTENT ── */
+      .content {
+        flex: 1;
+        padding: 24px;
+      }
+
+      /* ── PAGE HEADER ── */
+      .ph {
+        margin-bottom: 22px;
+      }
+      .ph h1 {
+        font-size: 21px;
+        font-weight: 700;
+        color: var(--ink);
+        letter-spacing: -0.3px;
+        line-height: 1.2;
+      }
+      .ph p {
+        font-size: 13px;
+        color: var(--ink-muted);
+        margin-top: 3px;
+      }
+      .ph-row {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+
+      /* ── BUTTONS ── */
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 16px;
+        border-radius: var(--r-full);
+        font-size: 13.5px;
+        font-weight: 500;
+        border: none;
+        transition:
+          background 0.1s,
+          transform 0.08s;
+        white-space: nowrap;
+        cursor: pointer;
+      }
+      .btn:active {
+        transform: scale(0.98);
+      }
+      .btn svg {
+        width: 15px;
+        height: 15px;
+        flex-shrink: 0;
+      }
+      .btn-primary {
+        background: var(--primary);
+        color: #fff;
+      }
+      .btn-primary:hover {
+        background: var(--primary-press);
+      }
+      .btn-secondary {
+        background: var(--surface);
+        color: var(--ink-2);
+        border: 1px solid var(--hairline);
+        box-shadow: var(--shadow-sm);
+      }
+      .btn-secondary:hover {
+        background: var(--bg);
+      }
+      .btn-ghost {
+        background: transparent;
+        color: var(--ink-muted);
+        border: 1px solid transparent;
+        padding: 6px 10px;
+        border-radius: var(--r-md);
+      }
+      .btn-ghost:hover {
+        background: var(--bg);
+        color: var(--ink-2);
+      }
+      .btn-sm {
+        padding: 5px 12px;
+        font-size: 12.5px;
+      }
+      .btn-utility {
+        padding: 5px 12px;
+        border-radius: var(--r-md);
+        background: var(--surface);
+        color: var(--ink-2);
+        border: 1px solid var(--hairline);
+        font-size: 12.5px;
+        font-weight: 500;
+        cursor: pointer;
+      }
+      .btn-utility:hover {
+        background: var(--bg);
+      }
+      .btn-danger-ghost {
+        background: transparent;
+        color: var(--danger);
+        border: 1px solid transparent;
+        padding: 4px 8px;
+        border-radius: var(--r-sm);
+        font-size: 12px;
+        cursor: pointer;
+      }
+      .btn-danger-ghost:hover {
+        background: var(--danger-light);
+      }
+
+      /* ── CARDS ── */
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--hairline);
+        border-radius: var(--r-lg);
+        padding: 20px;
+      }
+      .card-title {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--ink-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        margin-bottom: 12px;
+      }
+
+      /* ── KPI CARDS ── */
+      .kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+        margin-bottom: 18px;
+      }
+      .kpi {
+        background: var(--surface);
+        border: 1px solid var(--hairline);
+        border-radius: var(--r-lg);
+        padding: 16px 18px;
+      }
+      .kpi-label {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--ink-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        margin-bottom: 5px;
+      }
+      .kpi-value {
+        font-size: 23px;
+        font-weight: 700;
+        color: var(--ink);
+        letter-spacing: -0.5px;
+        font-variant-numeric: tabular-nums;
+        line-height: 1.1;
+      }
+      .kpi-value.green {
+        color: var(--success);
+      }
+      .kpi-value.muted {
+        color: var(--ink-2);
+      }
+      .kpi-sub {
+        font-size: 11.5px;
+        color: var(--ink-faint);
+        margin-top: 3px;
+      }
+
+      /* ── GRID LAYOUTS ── */
+      .g2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+      .g3 {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 16px;
+      }
+      .g-sidebar {
+        display: grid;
+        grid-template-columns: 1fr 300px;
+        gap: 16px;
+        align-items: start;
+      }
+
+      /* ── FORM ── */
+      .fg {
+        margin-bottom: 14px;
+      }
+      .fg:last-child {
+        margin-bottom: 0;
+      }
+      .label {
+        display: block;
+        font-size: 12.5px;
+        font-weight: 500;
+        color: var(--ink-2);
+        margin-bottom: 5px;
+      }
+      .fc {
+        width: 100%;
+        padding: 7px 10px;
+        border: 1px solid var(--hairline);
+        border-radius: var(--r-xs);
+        font-size: 13.5px;
+        color: var(--ink);
+        background: var(--surface);
+        outline: none;
+        transition:
+          border-color 0.15s,
+          box-shadow 0.15s;
+      }
+      .fc:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(0, 117, 222, 0.1);
+      }
+      .fr {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+
+      /* ── TABLE ── */
+      .tbl-wrap {
+        overflow-x: auto;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13.5px;
+      }
+      thead th {
+        padding: 9px 12px;
+        text-align: left;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--ink-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        background: var(--bg);
+        border-bottom: 1px solid var(--hairline);
+      }
+      tbody td {
+        padding: 11px 12px;
+        border-bottom: 1px solid var(--hairline);
+        color: var(--ink-2);
+      }
+      tbody tr:last-child td {
+        border-bottom: none;
+      }
+      tbody tr:hover td {
+        background: var(--bg);
+      }
+      .num {
+        font-variant-numeric: tabular-nums;
+        font-weight: 500;
+        color: var(--ink);
+      }
+
+      /* ── PILLS ── */
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 3px 9px;
+        border-radius: var(--r-full);
+        font-size: 11.5px;
+        font-weight: 600;
+      }
+      .pill-success {
+        background: var(--success-light);
+        color: var(--success);
+      }
+      .pill-warning {
+        background: var(--warning-light);
+        color: var(--warning);
+      }
+      .pill-danger {
+        background: var(--danger-light);
+        color: var(--danger);
+      }
+      .pill-neutral {
+        background: var(--bg);
+        color: var(--ink-muted);
+        border: 1px solid var(--hairline);
+      }
+      .pill-primary {
+        background: var(--primary-light);
+        color: var(--primary);
+      }
+      .pill-indigo {
+        background: #edf0fa;
+        color: var(--secondary);
+      }
+
+      /* ── TOGGLE ── */
+      .toggle {
+        position: relative;
+        width: 38px;
+        height: 21px;
+        cursor: pointer;
+        flex-shrink: 0;
+      }
+      .toggle input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+        position: absolute;
+      }
+      .tgl-track {
+        position: absolute;
+        inset: 0;
+        background: var(--hairline);
+        border-radius: var(--r-full);
+        transition: background 0.2s;
+      }
+      .tgl-thumb {
+        position: absolute;
+        width: 17px;
+        height: 17px;
+        background: #fff;
+        border-radius: 50%;
+        top: 2px;
+        left: 2px;
+        transition: transform 0.2s;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
+      }
+      .toggle input:checked ~ .tgl-track {
+        background: var(--success);
+      }
+      .toggle input:checked ~ .tgl-thumb {
+        transform: translateX(17px);
+      }
+
+      /* ── ALERT ── */
+      .alert {
+        display: flex;
+        align-items: flex-start;
+        gap: 11px;
+        padding: 13px 16px;
+        border-radius: var(--r-lg);
+        margin-bottom: 16px;
+      }
+      .alert-success {
+        background: var(--success-light);
+        color: var(--success);
+      }
+      .alert-warning {
+        background: var(--warning-light);
+        color: var(--warning);
+      }
+      .alert svg {
+        width: 17px;
+        height: 17px;
+        flex-shrink: 0;
+        margin-top: 1px;
+      }
+      .alert-body {
+        flex: 1;
+      }
+      .alert-title {
+        font-size: 13.5px;
+        font-weight: 600;
+      }
+      .alert-desc {
+        font-size: 12.5px;
+        opacity: 0.8;
+        margin-top: 2px;
+      }
+
+      /* ── LINE ITEMS ── */
+      .li {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        padding: 11px 0;
+        border-bottom: 1px solid var(--hairline);
+      }
+      .li:last-child {
+        border-bottom: none;
+      }
+      .li-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: var(--r-md);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+      .li-icon svg {
+        width: 17px;
+        height: 17px;
+      }
+      .li-info {
+        flex: 1;
+        min-width: 0;
+      }
+      .li-name {
+        font-size: 13.5px;
+        font-weight: 500;
+        color: var(--ink);
+      }
+      .li-meta {
+        font-size: 12px;
+        color: var(--ink-faint);
+        margin-top: 1px;
+      }
+      .li-amt {
+        font-size: 14px;
+        font-weight: 600;
+        font-variant-numeric: tabular-nums;
+      }
+      .li-amt.debit {
+        color: var(--danger);
+      }
+
+      /* ── METHOD ROWS (caixa) ── */
+      .method-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 9px 0;
+        border-bottom: 1px solid var(--hairline);
+      }
+      .method-row:last-child {
+        border-bottom: none;
+      }
+      .method-lbl {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex: 1;
+        font-size: 13.5px;
+        font-weight: 500;
+        color: var(--ink-2);
+      }
+      .method-icon {
+        width: 26px;
+        height: 26px;
+        border-radius: var(--r-sm);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .method-icon svg {
+        width: 14px;
+        height: 14px;
+      }
+      .method-input {
+        width: 130px;
+        padding: 6px 10px;
+        border: 1px solid var(--hairline);
+        border-radius: var(--r-xs);
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--ink);
+        font-variant-numeric: tabular-nums;
+        text-align: right;
+        font-family: inherit;
+        outline: none;
+        background: var(--surface);
+      }
+      .method-input:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(0, 117, 222, 0.1);
+      }
+
+      /* ── PROGRESS ── */
+      .prog-bar {
+        height: 5px;
+        background: var(--bg);
+        border-radius: var(--r-full);
+        overflow: hidden;
+        border: 1px solid var(--hairline);
+      }
+      .prog-fill {
+        height: 100%;
+        border-radius: var(--r-full);
+        background: var(--primary);
+      }
+
+      /* ── MINI CHART ── */
+      .spark {
+        display: flex;
+        align-items: flex-end;
+        gap: 3px;
+        height: 56px;
+        margin-top: 12px;
+      }
+      .spark-bar {
+        flex: 1;
+        border-radius: 2px 2px 0 0;
+        background: var(--primary-light);
+        cursor: default;
+        min-width: 6px;
+        transition: background 0.1s;
+      }
+      .spark-bar:hover {
+        background: var(--primary);
+      }
+      .spark-bar.today {
+        background: var(--primary);
+      }
+      .spark-bar.missing {
+        background: var(--warning-light);
+      }
+      .spark-bar.future {
+        background: var(--bg);
+        border: 1px solid var(--hairline);
+      }
+
+      /* ── PRESENCE ROW ── */
+      .pres-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 13px;
+        border: 1px solid var(--hairline);
+        border-radius: var(--r-lg);
+        cursor: pointer;
+        transition: background 0.1s;
+        margin-bottom: 6px;
+      }
+      .pres-row:last-child {
+        margin-bottom: 0;
+      }
+      .pres-row:hover {
+        background: var(--bg);
+      }
+      .pres-row.absent {
+        background: var(--bg);
+      }
+
+      /* ── DIVIDER ── */
+      hr.div {
+        border: none;
+        border-top: 1px solid var(--hairline);
+        margin: 16px 0;
+      }
+
+      /* ── MODAL ── */
+      .modal-bg {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.22);
+        z-index: 200;
+        align-items: center;
+        justify-content: center;
+      }
+      .modal-bg.open {
+        display: flex;
+      }
+      .modal {
+        background: var(--surface);
+        border-radius: var(--r-xl);
+        box-shadow: var(--shadow-lg);
+        width: 100%;
+        max-width: 460px;
+        padding: 24px;
+        margin: 16px;
+      }
+      .modal-hdr {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 18px;
+      }
+      .modal-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--ink);
+        letter-spacing: -0.2px;
+      }
+      .modal-close {
+        width: 30px;
+        height: 30px;
+        border-radius: var(--r-full);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        border: none;
+        background: var(--bg);
+        color: var(--ink-muted);
+        font-size: 18px;
+        line-height: 1;
+      }
+      .modal-close:hover {
+        background: var(--hairline);
+      }
+      .modal-footer {
+        margin-top: 18px;
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+      }
+
+      /* ── SCREEN PANELS ── */
+      .screen {
+        display: none;
+      }
+      .screen.active {
+        display: block;
+      }
+
+      /* ── CAIXA SUMMARY CARD (indigo — single hero moment) ── */
+      .caixa-summary {
+        background: var(--secondary);
+        border-radius: var(--r-lg);
+        padding: 22px;
+        position: sticky;
+        top: calc(var(--topbar-h) + 20px);
+      }
+      .cs-section {
+        font-size: 11px;
+        font-weight: 700;
+        color: rgba(255, 255, 255, 0.5);
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        margin-bottom: 14px;
+      }
+      .cs-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 13.5px;
+        color: rgba(255, 255, 255, 0.78);
+        padding: 5px 0;
+      }
+      .cs-row:not(:last-child) {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      }
+      .cs-row span:last-child {
+        font-weight: 600;
+        font-variant-numeric: tabular-nums;
+      }
+      .cs-total-label {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.5);
+        margin-top: 16px;
+        margin-bottom: 5px;
+      }
+      .cs-total {
+        font-size: 30px;
+        font-weight: 700;
+        color: #fff;
+        letter-spacing: -0.5px;
+        font-variant-numeric: tabular-nums;
+      }
+
+      /* ── EMPTY STATE ── */
+      .empty {
+        text-align: center;
+        padding: 48px 24px;
+      }
+      .empty-icon {
+        width: 44px;
+        height: 44px;
+        background: var(--bg);
+        border-radius: var(--r-xl);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 14px;
+      }
+      .empty-icon svg {
+        width: 22px;
+        height: 22px;
+        color: var(--ink-faint);
+      }
+      .empty h3 {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--ink);
+        margin-bottom: 5px;
+      }
+      .empty p {
+        font-size: 13px;
+        color: var(--ink-muted);
+      }
+
+      /* ── RESPONSIVE ── */
+      @media (max-width: 1100px) {
+        .kpi-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .g-sidebar {
+          grid-template-columns: 1fr;
+        }
+        .caixa-summary {
+          position: static;
+        }
+      }
+      @media (max-width: 780px) {
+        .sidebar {
+          transform: translateX(-100%);
+        }
+        .sidebar.open {
+          transform: translateX(0);
+        }
+        .main {
+          margin-left: 0;
+        }
+        .hamburger {
+          display: flex;
+        }
+        .topbar {
+          padding: 0 14px;
+        }
+        .content {
+          padding: 14px;
+        }
+        .kpi-grid {
+          grid-template-columns: 1fr 1fr;
+          gap: 8px;
+        }
+        .g2 {
+          grid-template-columns: 1fr;
+        }
+        .g3 {
+          grid-template-columns: 1fr;
+        }
+        .fr {
+          grid-template-columns: 1fr;
+        }
+        .ph-row {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+        .topbar-title {
+          font-size: 13px;
+        }
+      }
+      @media (max-width: 440px) {
+        .kpi-grid {
+          grid-template-columns: 1fr;
+        }
+        .kpi-value {
+          font-size: 20px;
+        }
+        .caixa-pill span {
+          display: none;
+        }
+        .method-input {
+          width: 100px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+    <!-- ══════════════════════════════════════════
+     SIDEBAR
+══════════════════════════════════════════ -->
+    <nav class="sidebar" id="sidebar">
+      <div class="sb-logo">
+        <div class="sb-mark">
+          <svg viewBox="0 0 20 20">
+            <path
+              d="M10 3a7 7 0 1 0 0 14A7 7 0 0 0 10 3zm.75 9.5-3.25-1.88A.75.75 0 0 1 7 10V7a.75.75 0 0 1 1.5 0v2.56l2.75 1.59a.75.75 0 0 1-.75 1.3z"
+            />
+          </svg>
+        </div>
+        <div>
+          <div class="sb-name">Restora</div>
+          <div class="sb-sub">Dona Maria · Admin</div>
+        </div>
+      </div>
+
+      <div class="sb-nav">
+        <button
+          class="nav-item active"
+          onclick="nav('dashboard')"
+          data-screen="dashboard"
+        >
+          <svg
+            viewBox="0 0 20 20"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+          >
+            <rect x="3" y="3" width="6" height="6" rx="1.5" />
+            <rect x="11" y="3" width="6" height="6" rx="1.5" />
+            <rect x="3" y="11" width="6" height="6" rx="1.5" />
+            <rect x="11" y="11" width="6" height="6" rx="1.5" />
+          </svg>
+          Dashboard
+        </button>
+        <button class="nav-item" onclick="nav('caixa')" data-screen="caixa">
+          <svg
+            viewBox="0 0 20 20"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+          >
+            <rect x="2" y="5" width="16" height="11" rx="2" />
+            <path d="M2 9h16M6 13h2M10 13h4" />
+          </svg>
+          Caixa
+        </button>
+        <button
+          class="nav-item"
+          onclick="nav('despesas')"
+          data-screen="despesas"
+        >
+          <svg
+            viewBox="0 0 20 20"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+          >
+            <path d="M10 3v14M5 8h10M5 12h10" />
+            <rect x="3" y="3" width="14" height="14" rx="2" />
+          </svg>
+          Despesas
+          <span class="nav-badge">3</span>
+        </button>
+        <button
+          class="nav-item"
+          onclick="nav('funcionarios')"
+          data-screen="funcionarios"
+        >
+          <svg
+            viewBox="0 0 20 20"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+          >
+            <circle cx="8" cy="6" r="3" />
+            <path d="M2 17c0-3.31 2.69-6 6-6s6 2.69 6 6" />
+            <circle cx="15" cy="5" r="2" />
+            <path d="M18 16c0-2.21-1.34-4-3-4" />
+          </svg>
+          Funcionários
+        </button>
+        <button
+          class="nav-item"
+          onclick="nav('presenca')"
+          data-screen="presenca"
+        >
+          <svg
+            viewBox="0 0 20 20"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+          >
+            <rect x="3" y="3" width="14" height="14" rx="2" />
+            <path d="M7 10l2.5 2.5L13 8" />
+          </svg>
+          Presença
+        </button>
+        <button
+          class="nav-item"
+          onclick="nav('relatorios')"
+          data-screen="relatorios"
+        >
+          <svg
+            viewBox="0 0 20 20"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+          >
+            <path d="M4 15V9M8 15V5M12 15V11M16 15V7" />
+          </svg>
+          Relatórios
+        </button>
+        <div class="sb-sep"></div>
+        <button
+          class="nav-item"
+          onclick="nav('configuracoes')"
+          data-screen="configuracoes"
+        >
+          <svg
+            viewBox="0 0 20 20"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+          >
+            <circle cx="10" cy="10" r="2.5" />
+            <path
+              d="M10 3v1M10 16v1M3 10h1M16 10h1M5.05 5.05l.71.71M14.24 14.24l.71.71M14.24 5.76l-.71.71M5.76 14.24l-.71.71"
+            />
+          </svg>
+          Configurações
+        </button>
+      </div>
+
+      <div class="sb-footer">
+        <div class="sb-user">
+          <div
+            class="avatar"
+            style="width: 32px; height: 32px; font-size: 11px; font-weight: 700"
+          >
+            MF
+          </div>
+          <div class="sb-user-info">
+            <div class="sb-user-name">Marcos Ferreira</div>
+            <div class="sb-user-role">Dono</div>
+          </div>
+          <svg
+            viewBox="0 0 16 16"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            width="14"
+            height="14"
+          >
+            <path d="M4 6l4 4 4-4" />
+          </svg>
+        </div>
+      </div>
+    </nav>
+
+    <!-- ══════════════════════════════════════════
+     MAIN
+══════════════════════════════════════════ -->
+    <div class="main">
+      <header class="topbar">
+        <button class="hamburger" onclick="toggleSidebar()">
+          <svg
+            viewBox="0 0 20 20"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+          >
+            <path d="M3 5h14M3 10h14M3 15h14" />
+          </svg>
+        </button>
+        <div class="topbar-title" id="topbar-title">Dashboard</div>
+        <div style="display: flex; align-items: center; gap: 8px">
+          <div class="caixa-pill open" id="caixa-badge">
+            <div class="dot"></div>
+            <span>Caixa aberto</span>
+          </div>
+          <div
+            class="avatar"
+            style="width: 30px; height: 30px; font-size: 10px; cursor: pointer"
+          >
+            MF
+          </div>
+        </div>
+      </header>
+
+      <main class="content">
+        <!-- ══════════════════════════════════════════
+         DASHBOARD
+    ══════════════════════════════════════════ -->
+        <section
+          class="screen active"
+          id="screen-dashboard"
+          data-od-id="dashboard"
+        >
+          <div class="ph">
+            <h1>Bom dia, Marcos</h1>
+            <p>Quarta-feira, 28 de junho de 2026 · Marmita da Dona Maria</p>
+          </div>
+
+          <div class="alert alert-success">
+            <svg viewBox="0 0 20 20" fill="currentColor">
+              <path
+                fill-rule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                clip-rule="evenodd"
+              />
+            </svg>
+            <div class="alert-body">
+              <div class="alert-title">
+                Caixa aberto às 08:15 · Despesas e presença registradas
+              </div>
+              <div class="alert-desc">
+                3 funcionários presentes · 3 despesas lançadas · Pronto para
+                fechar
+              </div>
+            </div>
+            <button
+              class="btn btn-sm"
+              style="
+                background: var(--success);
+                color: #fff;
+                border-radius: var(--r-full);
+              "
+              onclick="nav('caixa')"
+            >
+              Ver Caixa
+            </button>
+          </div>
+
+          <div
+            style="
+              font-size: 11px;
+              font-weight: 600;
+              color: var(--ink-muted);
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+              margin-bottom: 9px;
+            "
+          >
+            Hoje · 28 Jun
+          </div>
+          <div class="kpi-grid">
+            <div class="kpi">
+              <div class="kpi-label">Vendas</div>
+              <div class="kpi-value">R$&nbsp;1.240</div>
+              <div class="kpi-sub">Dinheiro · PIX · Cartão</div>
+            </div>
+            <div class="kpi">
+              <div class="kpi-label">Despesas</div>
+              <div class="kpi-value muted">R$&nbsp;320</div>
+              <div class="kpi-sub">3 lançamentos</div>
+            </div>
+            <div class="kpi">
+              <div class="kpi-label">Pessoal</div>
+              <div class="kpi-value muted">R$&nbsp;180</div>
+              <div class="kpi-sub">3 de 3 presentes</div>
+            </div>
+            <div class="kpi">
+              <div class="kpi-label">Lucro Estimado</div>
+              <div class="kpi-value green">R$&nbsp;690</div>
+              <div class="kpi-sub">Antes do fechamento</div>
+            </div>
+          </div>
+
+          <div class="g2">
+            <!-- Acumulado mensal -->
+            <div class="card">
+              <div
+                style="
+                  display: flex;
+                  align-items: center;
+                  justify-content: space-between;
+                  margin-bottom: 16px;
+                "
+              >
+                <div class="card-title" style="margin-bottom: 0">
+                  Acumulado Junho
+                </div>
+                <button class="btn-utility" onclick="nav('relatorios')">
+                  Ver relatório
+                </button>
+              </div>
+              <div
+                style="
+                  display: grid;
+                  grid-template-columns: 1fr 1fr;
+                  gap: 16px;
+                  margin-bottom: 14px;
+                "
+              >
+                <div>
+                  <div
+                    style="
+                      font-size: 11px;
+                      color: var(--ink-faint);
+                      font-weight: 600;
+                      text-transform: uppercase;
+                      letter-spacing: 0.3px;
+                      margin-bottom: 4px;
+                    "
+                  >
+                    Faturamento
+                  </div>
+                  <div
+                    style="
+                      font-size: 21px;
+                      font-weight: 700;
+                      color: var(--ink);
+                      letter-spacing: -0.4px;
+                      font-variant-numeric: tabular-nums;
+                    "
+                  >
+                    R$ 18.600
+                  </div>
+                </div>
+                <div>
+                  <div
+                    style="
+                      font-size: 11px;
+                      color: var(--ink-faint);
+                      font-weight: 600;
+                      text-transform: uppercase;
+                      letter-spacing: 0.3px;
+                      margin-bottom: 4px;
+                    "
+                  >
+                    Lucro
+                  </div>
+                  <div
+                    style="
+                      font-size: 21px;
+                      font-weight: 700;
+                      color: var(--success);
+                      letter-spacing: -0.4px;
+                      font-variant-numeric: tabular-nums;
+                    "
+                  >
+                    R$ 11.100
+                  </div>
+                </div>
+                <div>
+                  <div
+                    style="
+                      font-size: 11px;
+                      color: var(--ink-faint);
+                      font-weight: 600;
+                      text-transform: uppercase;
+                      letter-spacing: 0.3px;
+                      margin-bottom: 4px;
+                    "
+                  >
+                    Despesas
+                  </div>
+                  <div
+                    style="
+                      font-size: 17px;
+                      font-weight: 600;
+                      color: var(--ink-2);
+                      font-variant-numeric: tabular-nums;
+                    "
+                  >
+                    R$ 4.800
+                  </div>
+                </div>
+                <div>
+                  <div
+                    style="
+                      font-size: 11px;
+                      color: var(--ink-faint);
+                      font-weight: 600;
+                      text-transform: uppercase;
+                      letter-spacing: 0.3px;
+                      margin-bottom: 4px;
+                    "
+                  >
+                    Pessoal
+                  </div>
+                  <div
+                    style="
+                      font-size: 17px;
+                      font-weight: 600;
+                      color: var(--ink-2);
+                      font-variant-numeric: tabular-nums;
+                    "
+                  >
+                    R$ 2.700
+                  </div>
+                </div>
+              </div>
+              <hr class="div" style="margin: 12px 0" />
+              <div
+                style="
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                  font-size: 13px;
+                  margin-bottom: 8px;
+                "
+              >
+                <span style="color: var(--ink-muted)">Dias operados</span>
+                <span style="font-weight: 600; color: var(--ink)"
+                  >18
+                  <span style="font-weight: 400; color: var(--ink-faint)"
+                    >/ 22 úteis</span
+                  ></span
+                >
+              </div>
+              <div class="prog-bar">
+                <div class="prog-fill" style="width: 81.8%"></div>
+              </div>
+              <div class="spark">
+                <div class="spark-bar" style="height: 70%"></div>
+                <div class="spark-bar" style="height: 85%"></div>
+                <div class="spark-bar" style="height: 60%"></div>
+                <div class="spark-bar" style="height: 90%"></div>
+                <div class="spark-bar" style="height: 75%"></div>
+                <div class="spark-bar missing" style="height: 35%"></div>
+                <div class="spark-bar" style="height: 82%"></div>
+                <div class="spark-bar" style="height: 91%"></div>
+                <div class="spark-bar" style="height: 65%"></div>
+                <div class="spark-bar" style="height: 88%"></div>
+                <div class="spark-bar" style="height: 72%"></div>
+                <div class="spark-bar" style="height: 79%"></div>
+                <div class="spark-bar missing" style="height: 38%"></div>
+                <div class="spark-bar" style="height: 84%"></div>
+                <div class="spark-bar" style="height: 93%"></div>
+                <div class="spark-bar" style="height: 67%"></div>
+                <div class="spark-bar" style="height: 77%"></div>
+                <div class="spark-bar" style="height: 87%"></div>
+                <div class="spark-bar today" style="height: 55%"></div>
+                <div class="spark-bar future"></div>
+                <div class="spark-bar future"></div>
+                <div class="spark-bar future"></div>
+              </div>
+              <div
+                style="
+                  display: flex;
+                  justify-content: space-between;
+                  font-size: 11px;
+                  color: var(--ink-faint);
+                  margin-top: 5px;
+                "
+              >
+                <span style="display: flex; align-items: center; gap: 5px"
+                  ><span
+                    style="
+                      width: 8px;
+                      height: 8px;
+                      background: var(--warning-light);
+                      border-radius: 2px;
+                      display: inline-block;
+                    "
+                  ></span
+                  >Dias incompletos</span
+                >
+                <span style="display: flex; align-items: center; gap: 5px"
+                  ><span
+                    style="
+                      width: 8px;
+                      height: 8px;
+                      background: var(--primary);
+                      border-radius: 2px;
+                      display: inline-block;
+                    "
+                  ></span
+                  >Hoje</span
+                >
+              </div>
+            </div>
+
+            <!-- Avisos + Ações rápidas -->
+            <div style="display: flex; flex-direction: column; gap: 14px">
+              <div class="card">
+                <div class="card-title">Avisos</div>
+                <div class="li">
+                  <div class="li-icon" style="background: var(--warning-light)">
+                    <svg viewBox="0 0 20 20" fill="var(--warning)">
+                      <path
+                        fill-rule="evenodd"
+                        d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 6a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 6zm0 9a1 1 0 100-2 1 1 0 000 2z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                  <div class="li-info">
+                    <div class="li-name">2 dias sem fechamento</div>
+                    <div class="li-meta">Jun 13 e Jun 20 sem registro</div>
+                  </div>
+                  <button
+                    class="btn-utility btn-sm"
+                    onclick="nav('relatorios')"
+                  >
+                    Ver
+                  </button>
+                </div>
+                <div class="li">
+                  <div class="li-icon" style="background: var(--primary-light)">
+                    <svg viewBox="0 0 20 20" fill="var(--primary)">
+                      <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div class="li-info">
+                    <div class="li-name">Presença registrada</div>
+                    <div class="li-meta">3 funcionários · Custo R$ 180</div>
+                  </div>
+                  <span class="pill pill-success">OK</span>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="card-title">Ações Rápidas</div>
+                <div style="display: flex; flex-direction: column; gap: 7px">
+                  <button
+                    class="btn btn-secondary"
+                    style="
+                      justify-content: flex-start;
+                      border-radius: var(--r-md);
+                    "
+                    onclick="openModal('modal-despesa')"
+                  >
+                    <svg
+                      viewBox="0 0 20 20"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      width="15"
+                      height="15"
+                    >
+                      <path d="M10 4v12M4 10h12" />
+                    </svg>
+                    Lançar Despesa
+                  </button>
+                  <button
+                    class="btn btn-secondary"
+                    style="
+                      justify-content: flex-start;
+                      border-radius: var(--r-md);
+                    "
+                    onclick="openModal('modal-sangria')"
+                  >
+                    <svg
+                      viewBox="0 0 20 20"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      width="15"
+                      height="15"
+                    >
+                      <path d="M10 4v12M4 10h12" />
+                    </svg>
+                    Registrar Sangria
+                  </button>
+                  <button
+                    class="btn btn-primary"
+                    style="
+                      justify-content: flex-start;
+                      border-radius: var(--r-md);
+                    "
+                    onclick="nav('caixa')"
+                  >
+                    <svg
+                      viewBox="0 0 20 20"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      width="15"
+                      height="15"
+                    >
+                      <rect x="2" y="5" width="16" height="11" rx="2" />
+                      <path d="M2 9h16" />
+                    </svg>
+                    Fechar Caixa
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ══════════════════════════════════════════
+         CAIXA
+    ══════════════════════════════════════════ -->
+        <section class="screen" id="screen-caixa" data-od-id="caixa">
+          <div class="ph">
+            <div class="ph-row">
+              <div>
+                <h1>Caixa · 28 Jun 2026</h1>
+                <p>Aberto às 08:15 · Marcos Ferreira</p>
+              </div>
+              <span
+                class="pill pill-success"
+                style="font-size: 12px; padding: 5px 12px"
+                >Caixa Aberto</span
+              >
+            </div>
+          </div>
+
+          <div class="g-sidebar">
+            <!-- Esquerda -->
+            <div style="display: flex; flex-direction: column; gap: 14px">
+              <!-- Vendas por método -->
+              <div class="card">
+                <div style="margin-bottom: 14px">
+                  <div
+                    style="font-size: 15px; font-weight: 700; color: var(--ink)"
+                  >
+                    Vendas por Método de Pagamento
+                  </div>
+                  <div
+                    style="
+                      font-size: 12.5px;
+                      color: var(--ink-faint);
+                      margin-top: 2px;
+                    "
+                  >
+                    Informe o total arrecadado em cada método
+                  </div>
+                </div>
+                <div>
+                  <div class="method-row">
+                    <div class="method-lbl">
+                      <div class="method-icon" style="background: #e8f5e9">
+                        <svg
+                          viewBox="0 0 20 20"
+                          fill="none"
+                          stroke="#1aae39"
+                          stroke-width="1.8"
+                        >
+                          <rect x="3" y="6" width="14" height="10" rx="2" />
+                          <path d="M7 6V5a3 3 0 016 0v1" />
+                        </svg>
+                      </div>
+                      Dinheiro
+                    </div>
+                    <input
+                      class="method-input"
+                      type="text"
+                      value="320,00"
+                      placeholder="0,00"
+                    />
+                  </div>
+                  <div class="method-row">
+                    <div class="method-lbl">
+                      <div
+                        class="method-icon"
+                        style="background: var(--primary-light)"
+                      >
+                        <svg
+                          viewBox="0 0 20 20"
+                          fill="none"
+                          stroke="var(--primary)"
+                          stroke-width="1.8"
+                        >
+                          <path
+                            d="M10 3a7 7 0 1 0 0 14A7 7 0 0 0 10 3zm-2 7l1.5 1.5L13 8"
+                          />
+                        </svg>
+                      </div>
+                      PIX
+                    </div>
+                    <input
+                      class="method-input"
+                      type="text"
+                      value="580,00"
+                      placeholder="0,00"
+                    />
+                  </div>
+                  <div class="method-row">
+                    <div class="method-lbl">
+                      <div class="method-icon" style="background: #f3e5f5">
+                        <svg
+                          viewBox="0 0 20 20"
+                          fill="none"
+                          stroke="#9c27b0"
+                          stroke-width="1.8"
+                        >
+                          <rect x="2" y="5" width="16" height="11" rx="2" />
+                          <path d="M2 9h16" />
+                        </svg>
+                      </div>
+                      Cartão Débito
+                    </div>
+                    <input
+                      class="method-input"
+                      type="text"
+                      value="240,00"
+                      placeholder="0,00"
+                    />
+                  </div>
+                  <div class="method-row">
+                    <div class="method-lbl">
+                      <div class="method-icon" style="background: #fce4ec">
+                        <svg
+                          viewBox="0 0 20 20"
+                          fill="none"
+                          stroke="#e91e63"
+                          stroke-width="1.8"
+                        >
+                          <rect x="2" y="5" width="16" height="11" rx="2" />
+                          <path d="M2 9h16" />
+                        </svg>
+                      </div>
+                      Cartão Crédito
+                    </div>
+                    <input
+                      class="method-input"
+                      type="text"
+                      value="100,00"
+                      placeholder="0,00"
+                    />
+                  </div>
+                  <div class="method-row">
+                    <div class="method-lbl">
+                      <div class="method-icon" style="background: #fff8e1">
+                        <svg
+                          viewBox="0 0 20 20"
+                          fill="none"
+                          stroke="#f59e0b"
+                          stroke-width="1.8"
+                        >
+                          <rect x="3" y="4" width="14" height="12" rx="2" />
+                          <path d="M7 10h6" />
+                        </svg>
+                      </div>
+                      Vale Refeição / Alimentação
+                    </div>
+                    <input
+                      class="method-input"
+                      type="text"
+                      value="0,00"
+                      placeholder="0,00"
+                    />
+                  </div>
+                </div>
+                <div
+                  style="
+                    margin-top: 14px;
+                    padding: 12px 14px;
+                    background: var(--bg);
+                    border-radius: var(--r-md);
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                  "
+                >
+                  <span
+                    style="
+                      font-size: 13px;
+                      color: var(--ink-muted);
+                      font-weight: 500;
+                    "
+                    >Total de Vendas</span
+                  >
+                  <span
+                    style="
+                      font-size: 19px;
+                      font-weight: 700;
+                      color: var(--ink);
+                      font-variant-numeric: tabular-nums;
+                      letter-spacing: -0.3px;
+                    "
+                    >R$ 1.240,00</span
+                  >
+                </div>
+              </div>
+
+              <!-- Sangrias -->
+              <div class="card">
+                <div
+                  style="
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    margin-bottom: 14px;
+                  "
+                >
+                  <div>
+                    <div
+                      style="
+                        font-size: 15px;
+                        font-weight: 700;
+                        color: var(--ink);
+                      "
+                    >
+                      Sangrias
+                    </div>
+                    <div
+                      style="
+                        font-size: 12.5px;
+                        color: var(--ink-faint);
+                        margin-top: 2px;
+                      "
+                    >
+                      Retiradas do caixa durante o expediente
+                    </div>
+                  </div>
+                  <button
+                    class="btn btn-sm btn-secondary"
+                    onclick="openModal('modal-sangria')"
+                  >
+                    <svg
+                      viewBox="0 0 20 20"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      width="13"
+                      height="13"
+                    >
+                      <path d="M10 4v12M4 10h12" />
+                    </svg>
+                    Nova Sangria
+                  </button>
+                </div>
+                <div class="li">
+                  <div class="li-icon" style="background: var(--warning-light)">
+                    <svg
+                      viewBox="0 0 20 20"
+                      fill="none"
+                      stroke="var(--warning)"
+                      stroke-width="1.8"
+                    >
+                      <circle cx="10" cy="10" r="7" />
+                      <path d="M10 7v3l2 2" />
+                    </svg>
+                  </div>
+                  <div class="li-info">
+                    <div class="li-name">Fundo de troco</div>
+                    <div class="li-meta">10:00 · Marcos Ferreira</div>
+                  </div>
+                  <div class="li-amt debit">− R$ 50,00</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Direita: resumo indigo -->
+            <div>
+              <div class="caixa-summary">
+                <div class="cs-section">Resumo do Caixa</div>
+                <div class="cs-row">
+                  <span>Vendas totais</span><span>R$ 1.240,00</span>
+                </div>
+                <div class="cs-row">
+                  <span>Sangrias</span><span>− R$ 50,00</span>
+                </div>
+                <div class="cs-row">
+                  <span>Despesas</span><span>− R$ 320,00</span>
+                </div>
+                <div class="cs-row">
+                  <span>Pessoal (3 × R$ 60)</span><span>− R$ 180,00</span>
+                </div>
+                <div class="cs-total-label">Lucro Estimado</div>
+                <div class="cs-total">R$ 690,00</div>
+                <button
+                  class="btn btn-primary"
+                  style="
+                    width: 100%;
+                    justify-content: center;
+                    margin-top: 18px;
+                    background: #fff;
+                    color: var(--secondary);
+                    font-weight: 700;
+                  "
+                  onclick="fecharCaixa()"
+                >
+                  Fechar Caixa
+                </button>
+                <div
+                  style="
+                    font-size: 11px;
+                    color: rgba(255, 255, 255, 0.4);
+                    text-align: center;
+                    margin-top: 10px;
+                  "
+                >
+                  O fechamento pode ser revisto pelo dono posteriormente
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ══════════════════════════════════════════
+         DESPESAS
+    ══════════════════════════════════════════ -->
+        <section class="screen" id="screen-despesas" data-od-id="despesas">
+          <div class="ph">
+            <div class="ph-row">
+              <div>
+                <h1>Despesas e Sangrias</h1>
+                <p>Lançamentos do dia · 28 Jun 2026</p>
+              </div>
+              <button
+                class="btn btn-primary"
+                onclick="openModal('modal-despesa')"
+              >
+                <svg
+                  viewBox="0 0 20 20"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  width="15"
+                  height="15"
+                >
+                  <path d="M10 4v12M4 10h12" />
+                </svg>
+                Nova Despesa
+              </button>
+            </div>
+          </div>
+
+          <div
+            class="kpi-grid"
+            style="grid-template-columns: repeat(3, 1fr); margin-bottom: 14px"
+          >
+            <div class="kpi">
+              <div class="kpi-label">Total Despesas</div>
+              <div class="kpi-value muted" style="font-size: 20px">
+                R$ 320,00
+              </div>
+              <div class="kpi-sub">3 lançamentos</div>
+            </div>
+            <div class="kpi">
+              <div class="kpi-label">Total Sangrias</div>
+              <div class="kpi-value muted" style="font-size: 20px">
+                R$ 50,00
+              </div>
+              <div class="kpi-sub">1 sangria</div>
+            </div>
+            <div class="kpi">
+              <div class="kpi-label">Total Saídas</div>
+              <div
+                class="kpi-value"
+                style="font-size: 20px; color: var(--danger)"
+              >
+                R$ 370,00
+              </div>
+              <div class="kpi-sub">Não inclui pessoal</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                margin-bottom: 14px;
+              "
+            >
+              <div style="font-size: 15px; font-weight: 700; color: var(--ink)">
+                Lançamentos de Hoje
+              </div>
+              <select
+                class="fc"
+                style="width: auto; font-size: 12.5px; padding: 5px 10px"
+              >
+                <option>Todas as categorias</option>
+                <option>Insumos</option>
+                <option>Infraestrutura</option>
+                <option>Outros</option>
+              </select>
+            </div>
+            <div class="tbl-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Categoria</th>
+                    <th>Descrição</th>
+                    <th>Responsável</th>
+                    <th>Horário</th>
+                    <th style="text-align: right">Valor</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="pill pill-neutral">Insumos</span></td>
+                    <td style="font-weight: 500; color: var(--ink)">
+                      Embalagens e sacolas
+                    </td>
+                    <td style="color: var(--ink-muted)">Ana Souza</td>
+                    <td style="color: var(--ink-faint)">09:30</td>
+                    <td style="text-align: right" class="num">R$ 85,00</td>
+                    <td><button class="btn-danger-ghost">Excluir</button></td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <span class="pill pill-neutral">Infraestrutura</span>
+                    </td>
+                    <td style="font-weight: 500; color: var(--ink)">
+                      Gás de cozinha
+                    </td>
+                    <td style="color: var(--ink-muted)">Marcos Ferreira</td>
+                    <td style="color: var(--ink-faint)">10:15</td>
+                    <td style="text-align: right" class="num">R$ 120,00</td>
+                    <td><button class="btn-danger-ghost">Excluir</button></td>
+                  </tr>
+                  <tr>
+                    <td><span class="pill pill-neutral">Insumos</span></td>
+                    <td style="font-weight: 500; color: var(--ink)">
+                      Legumes e verduras
+                    </td>
+                    <td style="color: var(--ink-muted)">Carla Mendes</td>
+                    <td style="color: var(--ink-faint)">11:40</td>
+                    <td style="text-align: right" class="num">R$ 115,00</td>
+                    <td><button class="btn-danger-ghost">Excluir</button></td>
+                  </tr>
+                  <tr style="background: var(--warning-light)">
+                    <td><span class="pill pill-warning">Sangria</span></td>
+                    <td style="font-weight: 500; color: var(--ink)">
+                      Fundo de troco
+                    </td>
+                    <td style="color: var(--ink-muted)">Marcos Ferreira</td>
+                    <td style="color: var(--ink-faint)">10:00</td>
+                    <td
+                      style="
+                        text-align: right;
+                        color: var(--warning);
+                        font-weight: 600;
+                        font-variant-numeric: tabular-nums;
+                      "
+                    >
+                      R$ 50,00
+                    </td>
+                    <td><button class="btn-danger-ghost">Excluir</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ══════════════════════════════════════════
+         FUNCIONÁRIOS
+    ══════════════════════════════════════════ -->
+        <section
+          class="screen"
+          id="screen-funcionarios"
+          data-od-id="funcionarios"
+        >
+          <div class="ph">
+            <div class="ph-row">
+              <div>
+                <h1>Funcionários</h1>
+                <p>3 funcionários ativos · Dona Maria</p>
+              </div>
+              <button
+                class="btn btn-primary"
+                onclick="openModal('modal-funcionario')"
+              >
+                <svg
+                  viewBox="0 0 20 20"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  width="15"
+                  height="15"
+                >
+                  <path d="M10 4v12M4 10h12" />
+                </svg>
+                Cadastrar
+              </button>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="tbl-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Funcionário</th>
+                    <th>Função</th>
+                    <th>Status</th>
+                    <th>Acesso</th>
+                    <th style="text-align: right">Custo/Dia</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <div
+                        style="display: flex; align-items: center; gap: 10px"
+                      >
+                        <div
+                          class="avatar"
+                          style="width: 36px; height: 36px; font-size: 12px"
+                        >
+                          AS
+                        </div>
+                        <div>
+                          <div
+                            style="
+                              font-weight: 600;
+                              color: var(--ink);
+                              font-size: 13.5px;
+                            "
+                          >
+                            Ana Souza
+                          </div>
+                          <div
+                            style="font-size: 11.5px; color: var(--ink-faint)"
+                          >
+                            ana@donamaria.com.br
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td style="color: var(--ink-muted)">Caixa</td>
+                    <td><span class="pill pill-success">Ativo</span></td>
+                    <td><span class="pill pill-indigo">Caixa</span></td>
+                    <td style="text-align: right" class="num">R$ 60,00</td>
+                    <td style="text-align: right">
+                      <button class="btn-utility">Editar</button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div
+                        style="display: flex; align-items: center; gap: 10px"
+                      >
+                        <div
+                          class="avatar"
+                          style="
+                            width: 36px;
+                            height: 36px;
+                            font-size: 12px;
+                            background: var(--warning);
+                          "
+                        >
+                          PL
+                        </div>
+                        <div>
+                          <div
+                            style="
+                              font-weight: 600;
+                              color: var(--ink);
+                              font-size: 13.5px;
+                            "
+                          >
+                            Pedro Lima
+                          </div>
+                          <div
+                            style="font-size: 11.5px; color: var(--ink-faint)"
+                          >
+                            Sem acesso ao sistema
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td style="color: var(--ink-muted)">Entregador</td>
+                    <td><span class="pill pill-success">Ativo</span></td>
+                    <td><span class="pill pill-neutral">Sem acesso</span></td>
+                    <td style="text-align: right" class="num">R$ 60,00</td>
+                    <td style="text-align: right">
+                      <button class="btn-utility">Editar</button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div
+                        style="display: flex; align-items: center; gap: 10px"
+                      >
+                        <div
+                          class="avatar"
+                          style="
+                            width: 36px;
+                            height: 36px;
+                            font-size: 12px;
+                            background: var(--teal);
+                          "
+                        >
+                          CM
+                        </div>
+                        <div>
+                          <div
+                            style="
+                              font-weight: 600;
+                              color: var(--ink);
+                              font-size: 13.5px;
+                            "
+                          >
+                            Carla Mendes
+                          </div>
+                          <div
+                            style="font-size: 11.5px; color: var(--ink-faint)"
+                          >
+                            Sem acesso ao sistema
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td style="color: var(--ink-muted)">Cozinha</td>
+                    <td><span class="pill pill-success">Ativo</span></td>
+                    <td><span class="pill pill-neutral">Sem acesso</span></td>
+                    <td style="text-align: right" class="num">R$ 60,00</td>
+                    <td style="text-align: right">
+                      <button class="btn-utility">Editar</button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ══════════════════════════════════════════
+         PRESENÇA
+    ══════════════════════════════════════════ -->
+        <section class="screen" id="screen-presenca" data-od-id="presenca">
+          <div class="ph">
+            <div class="ph-row">
+              <div>
+                <h1>Presença do Dia</h1>
+                <p>Quem trabalhou hoje · 28 Jun 2026</p>
+              </div>
+              <input
+                type="date"
+                value="2026-06-28"
+                class="fc"
+                style="width: auto"
+              />
+            </div>
+          </div>
+
+          <div class="g-sidebar">
+            <div class="card">
+              <div
+                style="
+                  font-size: 15px;
+                  font-weight: 700;
+                  color: var(--ink);
+                  margin-bottom: 4px;
+                "
+              >
+                Registro de Presença
+              </div>
+              <div
+                style="
+                  font-size: 13px;
+                  color: var(--ink-muted);
+                  margin-bottom: 18px;
+                "
+              >
+                O custo de pessoal é calculado automaticamente no fechamento do
+                caixa.
+              </div>
+
+              <div id="pres-list">
+                <div
+                  class="pres-row"
+                  id="row-ana"
+                  data-name="ana"
+                  onclick="togglePres(event, 'ana')"
+                >
+                  <div
+                    class="avatar"
+                    style="width: 40px; height: 40px; font-size: 13px"
+                  >
+                    AS
+                  </div>
+                  <div style="flex: 1">
+                    <div
+                      style="
+                        font-size: 14px;
+                        font-weight: 600;
+                        color: var(--ink);
+                      "
+                    >
+                      Ana Souza
+                    </div>
+                    <div style="font-size: 12px; color: var(--ink-faint)">
+                      Caixa · R$ 60,00 / dia
+                    </div>
+                  </div>
+                  <span class="pill pill-success" id="ppill-ana">Presente</span>
+                  <label class="toggle" onclick="event.stopPropagation()">
+                    <input
+                      type="checkbox"
+                      id="ptgl-ana"
+                      checked
+                      onchange="syncPres('ana')"
+                    />
+                    <div class="tgl-track"></div>
+                    <div class="tgl-thumb"></div>
+                  </label>
+                </div>
+                <div
+                  class="pres-row"
+                  id="row-pedro"
+                  data-name="pedro"
+                  onclick="togglePres(event, 'pedro')"
+                >
+                  <div
+                    class="avatar"
+                    style="
+                      width: 40px;
+                      height: 40px;
+                      font-size: 13px;
+                      background: var(--warning);
+                    "
+                  >
+                    PL
+                  </div>
+                  <div style="flex: 1">
+                    <div
+                      style="
+                        font-size: 14px;
+                        font-weight: 600;
+                        color: var(--ink);
+                      "
+                    >
+                      Pedro Lima
+                    </div>
+                    <div style="font-size: 12px; color: var(--ink-faint)">
+                      Entregador · R$ 60,00 / dia
+                    </div>
+                  </div>
+                  <span class="pill pill-success" id="ppill-pedro"
+                    >Presente</span
+                  >
+                  <label class="toggle" onclick="event.stopPropagation()">
+                    <input
+                      type="checkbox"
+                      id="ptgl-pedro"
+                      checked
+                      onchange="syncPres('pedro')"
+                    />
+                    <div class="tgl-track"></div>
+                    <div class="tgl-thumb"></div>
+                  </label>
+                </div>
+                <div
+                  class="pres-row"
+                  id="row-carla"
+                  data-name="carla"
+                  onclick="togglePres(event, 'carla')"
+                >
+                  <div
+                    class="avatar"
+                    style="
+                      width: 40px;
+                      height: 40px;
+                      font-size: 13px;
+                      background: var(--teal);
+                    "
+                  >
+                    CM
+                  </div>
+                  <div style="flex: 1">
+                    <div
+                      style="
+                        font-size: 14px;
+                        font-weight: 600;
+                        color: var(--ink);
+                      "
+                    >
+                      Carla Mendes
+                    </div>
+                    <div style="font-size: 12px; color: var(--ink-faint)">
+                      Cozinha · R$ 60,00 / dia
+                    </div>
+                  </div>
+                  <span class="pill pill-success" id="ppill-carla"
+                    >Presente</span
+                  >
+                  <label class="toggle" onclick="event.stopPropagation()">
+                    <input
+                      type="checkbox"
+                      id="ptgl-carla"
+                      checked
+                      onchange="syncPres('carla')"
+                    />
+                    <div class="tgl-track"></div>
+                    <div class="tgl-thumb"></div>
+                  </label>
+                </div>
+              </div>
+
+              <div
+                style="
+                  margin-top: 18px;
+                  display: flex;
+                  justify-content: flex-end;
+                "
+              >
+                <button class="btn btn-primary">Salvar Presença</button>
+              </div>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 12px">
+              <div class="card">
+                <div class="card-title">Resumo Hoje</div>
+                <div
+                  style="
+                    font-size: 30px;
+                    font-weight: 700;
+                    color: var(--ink);
+                    letter-spacing: -0.5px;
+                    margin: 6px 0 3px;
+                  "
+                  id="pres-count"
+                >
+                  3 / 3
+                </div>
+                <div style="font-size: 13px; color: var(--ink-muted)">
+                  funcionários presentes
+                </div>
+                <hr class="div" />
+                <div
+                  style="
+                    display: flex;
+                    justify-content: space-between;
+                    font-size: 13.5px;
+                  "
+                >
+                  <span style="color: var(--ink-muted)">Custo de pessoal</span>
+                  <span
+                    style="
+                      font-weight: 700;
+                      color: var(--ink);
+                      font-variant-numeric: tabular-nums;
+                    "
+                    id="pres-custo"
+                    >R$ 180,00</span
+                  >
+                </div>
+              </div>
+              <div class="card">
+                <div class="card-title" style="margin-bottom: 11px">
+                  Esta Semana
+                </div>
+                <div
+                  style="
+                    display: flex;
+                    flex-direction: column;
+                    gap: 7px;
+                    font-size: 13px;
+                  "
+                >
+                  <div style="display: flex; justify-content: space-between">
+                    <span style="color: var(--ink-muted)">Seg, 23</span
+                    ><span class="pill pill-success" style="font-size: 11px"
+                      >3/3</span
+                    >
+                  </div>
+                  <div style="display: flex; justify-content: space-between">
+                    <span style="color: var(--ink-muted)">Ter, 24</span
+                    ><span class="pill pill-warning" style="font-size: 11px"
+                      >2/3</span
+                    >
+                  </div>
+                  <div style="display: flex; justify-content: space-between">
+                    <span style="color: var(--ink-muted)">Qua, 25</span
+                    ><span class="pill pill-success" style="font-size: 11px"
+                      >3/3</span
+                    >
+                  </div>
+                  <div style="display: flex; justify-content: space-between">
+                    <span style="color: var(--ink-muted)">Qui, 26</span
+                    ><span class="pill pill-success" style="font-size: 11px"
+                      >3/3</span
+                    >
+                  </div>
+                  <div style="display: flex; justify-content: space-between">
+                    <span style="color: var(--ink-muted)">Sex, 27</span
+                    ><span class="pill pill-success" style="font-size: 11px"
+                      >3/3</span
+                    >
+                  </div>
+                  <div
+                    style="
+                      display: flex;
+                      justify-content: space-between;
+                      font-weight: 600;
+                    "
+                  >
+                    <span style="color: var(--ink)">Hoje, 28</span
+                    ><span class="pill pill-primary" style="font-size: 11px"
+                      >3/3</span
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ══════════════════════════════════════════
+         RELATÓRIOS
+    ══════════════════════════════════════════ -->
+        <section class="screen" id="screen-relatorios" data-od-id="relatorios">
+          <div class="ph">
+            <div class="ph-row">
+              <div>
+                <h1>Relatórios</h1>
+                <p>Histórico financeiro · Dona Maria</p>
+              </div>
+              <div style="display: flex; gap: 8px; align-items: center">
+                <select class="fc" style="width: auto; font-size: 13px">
+                  <option>Junho 2026</option>
+                  <option>Maio 2026</option>
+                  <option>Abril 2026</option>
+                </select>
+                <button class="btn btn-secondary btn-sm">Exportar</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="kpi-grid" style="margin-bottom: 16px">
+            <div class="kpi">
+              <div class="kpi-label">Faturamento</div>
+              <div class="kpi-value" style="font-size: 20px">R$ 18.600</div>
+              <div class="kpi-sub">18 dias operados</div>
+            </div>
+            <div class="kpi">
+              <div class="kpi-label">Despesas</div>
+              <div class="kpi-value muted" style="font-size: 20px">
+                R$ 4.800
+              </div>
+              <div class="kpi-sub">Insumos e infraestrutura</div>
+            </div>
+            <div class="kpi">
+              <div class="kpi-label">Pessoal</div>
+              <div class="kpi-value muted" style="font-size: 20px">
+                R$ 2.700
+              </div>
+              <div class="kpi-sub">3 funcionários</div>
+            </div>
+            <div class="kpi">
+              <div class="kpi-label">Lucro</div>
+              <div class="kpi-value green" style="font-size: 20px">
+                R$ 11.100
+              </div>
+              <div class="kpi-sub">59,7% margem</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                margin-bottom: 14px;
+              "
+            >
+              <div style="font-size: 15px; font-weight: 700; color: var(--ink)">
+                Fechamentos do Mês
+              </div>
+              <span class="pill pill-danger">2 dias incompletos</span>
+            </div>
+            <div class="tbl-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Data</th>
+                    <th>Abertura</th>
+                    <th>Fechamento</th>
+                    <th style="text-align: right">Vendas</th>
+                    <th style="text-align: right">Despesas</th>
+                    <th style="text-align: right">Pessoal</th>
+                    <th style="text-align: right">Lucro</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style="font-weight: 600; color: var(--ink)">28 Jun</td>
+                    <td style="color: var(--ink-muted)">08:15</td>
+                    <td style="color: var(--ink-faint)">—</td>
+                    <td style="text-align: right" class="num">R$ 1.240</td>
+                    <td style="text-align: right" class="num">R$ 320</td>
+                    <td style="text-align: right" class="num">R$ 180</td>
+                    <td
+                      style="
+                        text-align: right;
+                        color: var(--success);
+                        font-weight: 600;
+                        font-variant-numeric: tabular-nums;
+                      "
+                    >
+                      R$ 690
+                    </td>
+                    <td><span class="pill pill-warning">Aberto</span></td>
+                  </tr>
+                  <tr>
+                    <td style="font-weight: 500; color: var(--ink)">27 Jun</td>
+                    <td style="color: var(--ink-muted)">08:00</td>
+                    <td style="color: var(--ink-muted)">18:30</td>
+                    <td style="text-align: right" class="num">R$ 1.180</td>
+                    <td style="text-align: right" class="num">R$ 280</td>
+                    <td style="text-align: right" class="num">R$ 180</td>
+                    <td
+                      style="
+                        text-align: right;
+                        color: var(--success);
+                        font-weight: 600;
+                        font-variant-numeric: tabular-nums;
+                      "
+                    >
+                      R$ 720
+                    </td>
+                    <td><span class="pill pill-success">Fechado</span></td>
+                  </tr>
+                  <tr>
+                    <td style="font-weight: 500; color: var(--ink)">26 Jun</td>
+                    <td style="color: var(--ink-muted)">08:10</td>
+                    <td style="color: var(--ink-muted)">18:45</td>
+                    <td style="text-align: right" class="num">R$ 950</td>
+                    <td style="text-align: right" class="num">R$ 190</td>
+                    <td style="text-align: right" class="num">R$ 180</td>
+                    <td
+                      style="
+                        text-align: right;
+                        color: var(--success);
+                        font-weight: 600;
+                        font-variant-numeric: tabular-nums;
+                      "
+                    >
+                      R$ 580
+                    </td>
+                    <td><span class="pill pill-success">Fechado</span></td>
+                  </tr>
+                  <tr style="background: var(--danger-light)">
+                    <td style="font-weight: 600; color: var(--danger)">
+                      20 Jun
+                    </td>
+                    <td style="color: var(--ink-muted)">08:20</td>
+                    <td style="color: var(--danger); font-weight: 500">
+                      Sem registro
+                    </td>
+                    <td style="text-align: right; color: var(--ink-faint)">
+                      —
+                    </td>
+                    <td style="text-align: right; color: var(--ink-faint)">
+                      —
+                    </td>
+                    <td style="text-align: right; color: var(--ink-faint)">
+                      —
+                    </td>
+                    <td style="text-align: right; color: var(--ink-faint)">
+                      —
+                    </td>
+                    <td><span class="pill pill-danger">Incompleto</span></td>
+                  </tr>
+                  <tr>
+                    <td style="font-weight: 500; color: var(--ink)">19 Jun</td>
+                    <td style="color: var(--ink-muted)">08:05</td>
+                    <td style="color: var(--ink-muted)">18:20</td>
+                    <td style="text-align: right" class="num">R$ 1.320</td>
+                    <td style="text-align: right" class="num">R$ 310</td>
+                    <td style="text-align: right" class="num">R$ 180</td>
+                    <td
+                      style="
+                        text-align: right;
+                        color: var(--success);
+                        font-weight: 600;
+                        font-variant-numeric: tabular-nums;
+                      "
+                    >
+                      R$ 830
+                    </td>
+                    <td><span class="pill pill-success">Fechado</span></td>
+                  </tr>
+                  <tr style="background: var(--danger-light)">
+                    <td style="font-weight: 600; color: var(--danger)">
+                      13 Jun
+                    </td>
+                    <td style="color: var(--ink-muted)">07:55</td>
+                    <td style="color: var(--danger); font-weight: 500">
+                      Sem registro
+                    </td>
+                    <td style="text-align: right; color: var(--ink-faint)">
+                      —
+                    </td>
+                    <td style="text-align: right; color: var(--ink-faint)">
+                      —
+                    </td>
+                    <td style="text-align: right; color: var(--ink-faint)">
+                      —
+                    </td>
+                    <td style="text-align: right; color: var(--ink-faint)">
+                      —
+                    </td>
+                    <td><span class="pill pill-danger">Incompleto</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ══════════════════════════════════════════
+         CONFIGURAÇÕES
+    ══════════════════════════════════════════ -->
+        <section
+          class="screen"
+          id="screen-configuracoes"
+          data-od-id="configuracoes"
+        >
+          <div class="ph">
+            <h1>Configurações</h1>
+            <p>Dados do restaurante e permissões de acesso</p>
+          </div>
+
+          <div class="g2">
+            <div class="card">
+              <div
+                style="
+                  font-size: 15px;
+                  font-weight: 700;
+                  color: var(--ink);
+                  margin-bottom: 18px;
+                "
+              >
+                Dados do Restaurante
+              </div>
+              <div class="fg">
+                <label class="label">Nome do estabelecimento</label
+                ><input class="fc" type="text" value="Marmita da Dona Maria" />
+              </div>
+              <div class="fg">
+                <label class="label">Telefone</label
+                ><input class="fc" type="text" value="(11) 98765-4321" />
+              </div>
+              <div class="fg">
+                <label class="label">Endereço</label
+                ><input
+                  class="fc"
+                  type="text"
+                  value="Rua das Flores, 123 — São Paulo, SP"
+                />
+              </div>
+              <div class="fg">
+                <label class="label">Horário de funcionamento</label>
+                <div class="fr">
+                  <input class="fc" type="time" value="08:00" /><input
+                    class="fc"
+                    type="time"
+                    value="18:00"
+                  />
+                </div>
+              </div>
+              <button class="btn btn-primary">Salvar Alterações</button>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 14px">
+              <div class="card">
+                <div
+                  style="
+                    font-size: 15px;
+                    font-weight: 700;
+                    color: var(--ink);
+                    margin-bottom: 14px;
+                  "
+                >
+                  Categorias de Despesas
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 7px">
+                  <div
+                    style="
+                      display: flex;
+                      align-items: center;
+                      justify-content: space-between;
+                      padding: 9px 11px;
+                      border: 1px solid var(--hairline);
+                      border-radius: var(--r-md);
+                    "
+                  >
+                    <span style="font-size: 13.5px; color: var(--ink-2)"
+                      >Insumos</span
+                    ><button class="btn-danger-ghost">Remover</button>
+                  </div>
+                  <div
+                    style="
+                      display: flex;
+                      align-items: center;
+                      justify-content: space-between;
+                      padding: 9px 11px;
+                      border: 1px solid var(--hairline);
+                      border-radius: var(--r-md);
+                    "
+                  >
+                    <span style="font-size: 13.5px; color: var(--ink-2)"
+                      >Infraestrutura</span
+                    ><button class="btn-danger-ghost">Remover</button>
+                  </div>
+                  <div
+                    style="
+                      display: flex;
+                      align-items: center;
+                      justify-content: space-between;
+                      padding: 9px 11px;
+                      border: 1px solid var(--hairline);
+                      border-radius: var(--r-md);
+                    "
+                  >
+                    <span style="font-size: 13.5px; color: var(--ink-2)"
+                      >Manutenção</span
+                    ><button class="btn-danger-ghost">Remover</button>
+                  </div>
+                  <div
+                    style="
+                      display: flex;
+                      align-items: center;
+                      justify-content: space-between;
+                      padding: 9px 11px;
+                      border: 1px solid var(--hairline);
+                      border-radius: var(--r-md);
+                    "
+                  >
+                    <span style="font-size: 13.5px; color: var(--ink-2)"
+                      >Outros</span
+                    ><button class="btn-danger-ghost">Remover</button>
+                  </div>
+                  <button
+                    class="btn btn-secondary btn-sm"
+                    style="border-radius: var(--r-md); justify-content: center"
+                  >
+                    <svg
+                      viewBox="0 0 20 20"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      width="13"
+                      height="13"
+                    >
+                      <path d="M10 4v12M4 10h12" />
+                    </svg>
+                    Adicionar categoria
+                  </button>
+                </div>
+              </div>
+
+              <div class="card">
+                <div
+                  style="
+                    font-size: 15px;
+                    font-weight: 700;
+                    color: var(--ink);
+                    margin-bottom: 4px;
+                  "
+                >
+                  Acesso e Permissões
+                </div>
+                <div
+                  style="
+                    font-size: 13px;
+                    color: var(--ink-muted);
+                    margin-bottom: 14px;
+                  "
+                >
+                  O papel de cada usuário define o que ele pode acessar.
+                </div>
+                <div
+                  style="
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    padding: 12px 0;
+                    border-bottom: 1px solid var(--hairline);
+                  "
+                >
+                  <div>
+                    <div
+                      style="
+                        font-size: 13.5px;
+                        font-weight: 500;
+                        color: var(--ink);
+                      "
+                    >
+                      Marcos Ferreira
+                    </div>
+                    <div style="font-size: 11.5px; color: var(--ink-faint)">
+                      Acesso total · Relatórios e configurações
+                    </div>
+                  </div>
+                  <span class="pill pill-indigo">Dono</span>
+                </div>
+                <div
+                  style="
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    padding: 12px 0;
+                  "
+                >
+                  <div>
+                    <div
+                      style="
+                        font-size: 13.5px;
+                        font-weight: 500;
+                        color: var(--ink);
+                      "
+                    >
+                      Ana Souza
+                    </div>
+                    <div style="font-size: 11.5px; color: var(--ink-faint)">
+                      Registra dados operacionais · Sem relatórios
+                    </div>
+                  </div>
+                  <span class="pill pill-neutral">Caixa</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- ══════════════════════════════════════════
+     MODALS
+══════════════════════════════════════════ -->
+    <div class="modal-bg" id="modal-despesa">
+      <div class="modal">
+        <div class="modal-hdr">
+          <div class="modal-title">Nova Despesa</div>
+          <button class="modal-close" onclick="closeModal('modal-despesa')">
+            ×
+          </button>
+        </div>
+        <div class="fr" style="margin-bottom: 14px">
+          <div class="fg" style="margin-bottom: 0">
+            <label class="label">Data</label
+            ><input class="fc" type="date" value="2026-06-28" />
+          </div>
+          <div class="fg" style="margin-bottom: 0">
+            <label class="label">Categoria</label
+            ><select class="fc">
+              <option>Insumos</option>
+              <option>Infraestrutura</option>
+              <option>Manutenção</option>
+              <option>Outros</option>
+            </select>
+          </div>
+        </div>
+        <div class="fg">
+          <label class="label">Valor (R$)</label
+          ><input
+            class="fc"
+            type="number"
+            placeholder="0,00"
+            step="0.01"
+            min="0"
+          />
+        </div>
+        <div class="fg">
+          <label class="label">Descrição</label
+          ><input
+            class="fc"
+            type="text"
+            placeholder="Ex: Embalagens e sacolas"
+          />
+        </div>
+        <div class="fg">
+          <label class="label">Responsável</label
+          ><select class="fc">
+            <option>Marcos Ferreira</option>
+            <option>Ana Souza</option>
+            <option>Carla Mendes</option>
+          </select>
+        </div>
+        <div class="modal-footer">
+          <button
+            class="btn btn-secondary"
+            onclick="closeModal('modal-despesa')"
+          >
+            Cancelar
+          </button>
+          <button class="btn btn-primary" onclick="closeModal('modal-despesa')">
+            Salvar Despesa
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-bg" id="modal-sangria">
+      <div class="modal">
+        <div class="modal-hdr">
+          <div class="modal-title">Nova Sangria</div>
+          <button class="modal-close" onclick="closeModal('modal-sangria')">
+            ×
+          </button>
+        </div>
+        <div class="fg">
+          <label class="label">Valor (R$)</label
+          ><input
+            class="fc"
+            type="number"
+            placeholder="0,00"
+            step="0.01"
+            min="0"
+          />
+        </div>
+        <div class="fg">
+          <label class="label">Observação</label
+          ><input
+            class="fc"
+            type="text"
+            placeholder="Ex: Fundo de troco para o caixa"
+          />
+        </div>
+        <div class="fg">
+          <label class="label">Responsável</label
+          ><select class="fc">
+            <option>Marcos Ferreira</option>
+            <option>Ana Souza</option>
+          </select>
+        </div>
+        <div class="modal-footer">
+          <button
+            class="btn btn-secondary"
+            onclick="closeModal('modal-sangria')"
+          >
+            Cancelar
+          </button>
+          <button class="btn btn-primary" onclick="closeModal('modal-sangria')">
+            Registrar Sangria
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-bg" id="modal-funcionario">
+      <div class="modal">
+        <div class="modal-hdr">
+          <div class="modal-title">Cadastrar Funcionário</div>
+          <button class="modal-close" onclick="closeModal('modal-funcionario')">
+            ×
+          </button>
+        </div>
+        <div class="fg">
+          <label class="label">Nome completo</label
+          ><input class="fc" type="text" placeholder="Nome do funcionário" />
+        </div>
+        <div class="fr">
+          <div class="fg" style="margin-bottom: 0">
+            <label class="label">Função</label
+            ><select class="fc">
+              <option>Caixa</option>
+              <option>Cozinha</option>
+              <option>Entregador</option>
+              <option>Outro</option>
+            </select>
+          </div>
+          <div class="fg" style="margin-bottom: 0">
+            <label class="label">Custo diário (R$)</label
+            ><input
+              class="fc"
+              type="number"
+              placeholder="60,00"
+              step="0.01"
+              min="0"
+            />
+          </div>
+        </div>
+        <div class="fg" style="margin-top: 14px">
+          <label class="label">E-mail (para acesso ao sistema — opcional)</label
+          ><input class="fc" type="email" placeholder="email@exemplo.com" />
+        </div>
+        <div class="modal-footer">
+          <button
+            class="btn btn-secondary"
+            onclick="closeModal('modal-funcionario')"
+          >
+            Cancelar
+          </button>
+          <button
+            class="btn btn-primary"
+            onclick="closeModal('modal-funcionario')"
+          >
+            Cadastrar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      /* ── NAV ── */
+      const SCREENS = [
+        "dashboard",
+        "caixa",
+        "despesas",
+        "funcionarios",
+        "presenca",
+        "relatorios",
+        "configuracoes",
+      ];
+      const LABELS = {
+        dashboard: "Dashboard",
+        caixa: "Caixa",
+        despesas: "Despesas",
+        funcionarios: "Funcionários",
+        presenca: "Presença",
+        relatorios: "Relatórios",
+        configuracoes: "Configurações",
+      };
+
+      function nav(id) {
+        SCREENS.forEach((s) => {
+          const sc = document.getElementById("screen-" + s);
+          const ni = document.querySelector('[data-screen="' + s + '"]');
+          if (sc) sc.classList.toggle("active", s === id);
+          if (ni) ni.classList.toggle("active", s === id);
+        });
+        const el = document.getElementById("topbar-title");
+        if (el) el.textContent = LABELS[id] || id;
+        closeSidebar();
+        window.scrollTo({ top: 0, behavior: "instant" });
+      }
+
+      /* ── SIDEBAR MOBILE ── */
+      function toggleSidebar() {
+        document.getElementById("sidebar").classList.toggle("open");
+        document.getElementById("overlay").classList.toggle("open");
+      }
+      function closeSidebar() {
+        document.getElementById("sidebar").classList.remove("open");
+        document.getElementById("overlay").classList.remove("open");
+      }
+
+      /* ── MODALS ── */
+      function openModal(id) {
+        document.getElementById(id).classList.add("open");
+        document.body.style.overflow = "hidden";
+      }
+      function closeModal(id) {
+        document.getElementById(id).classList.remove("open");
+        document.body.style.overflow = "";
+      }
+      document.querySelectorAll(".modal-bg").forEach((el) => {
+        el.addEventListener("click", (e) => {
+          if (e.target === el) closeModal(el.id);
+        });
+      });
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape")
+          document
+            .querySelectorAll(".modal-bg.open")
+            .forEach((el) => closeModal(el.id));
+      });
+
+      /* ── PRESENÇA ── */
+      const presState = { ana: true, pedro: true, carla: true };
+      const dailyCost = { ana: 60, pedro: 60, carla: 60 };
+
+      function togglePres(e, name) {
+        presState[name] = !presState[name];
+        document.getElementById("ptgl-" + name).checked = presState[name];
+        updatePresUI(name);
+        updatePresSummary();
+      }
+      function syncPres(name) {
+        presState[name] = document.getElementById("ptgl-" + name).checked;
+        updatePresUI(name);
+        updatePresSummary();
+      }
+      function updatePresUI(name) {
+        const pill = document.getElementById("ppill-" + name);
+        const row = document.getElementById("row-" + name);
+        if (presState[name]) {
+          pill.className = "pill pill-success";
+          pill.textContent = "Presente";
+          row.classList.remove("absent");
+        } else {
+          pill.className = "pill pill-neutral";
+          pill.textContent = "Ausente";
+          row.classList.add("absent");
+        }
+      }
+      function updatePresSummary() {
+        const names = Object.keys(presState);
+        const present = names.filter((n) => presState[n]);
+        const total = present.reduce((s, n) => s + dailyCost[n], 0);
+        const countEl = document.getElementById("pres-count");
+        const custoEl = document.getElementById("pres-custo");
+        if (countEl)
+          countEl.textContent = present.length + " / " + names.length;
+        if (custoEl)
+          custoEl.textContent = "R$ " + total.toFixed(2).replace(".", ",");
+      }
+
+      /* ── FECHAR CAIXA ── */
+      function fecharCaixa() {
+        if (
+          !confirm(
+            "Confirmar fechamento do caixa?\n\nApós fechar, ajustes ficam registrados como correções posteriores.",
+          )
+        )
+          return;
+        const badge = document.getElementById("caixa-badge");
+        badge.className = "caixa-pill closed";
+        badge.innerHTML = '<div class="dot"></div><span>Caixa fechado</span>';
+        nav("relatorios");
+      }
+    </script>
+  </body>
+</html>
